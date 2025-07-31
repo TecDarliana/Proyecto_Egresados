@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Datos</title>
+    <style>
+        /* Estilos básicos para que se vea un poco mejor */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        form { background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-section { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="email"], select, textarea {
+            width: calc(100% - 22px); /* Ajusta para padding y borde */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .errorlist {
+            color: red;
+            list-style-type: none;
+            padding: 0;
+            margin-top: -8px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Registro de Usuario</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-section">
+            <h2>Datos Personales</h2>
+            {{ personal_form.as_p }}
+            <p>
+                <script>
+                    function filtrarDireccion(value) {
+                        console.log("Filtrando por: " + value);
+                        // Implementa tu lógica AJAX aquí para actualizar los select de municipio y parroquia
+                        // con base en el 'estado' o 'municipio' seleccionado.
+                        // Esto probablemente requerirá una nueva llamada a la API o a otra vista de Django.
+                    }
+                </script>
+            </p>
+        </div>
+
+        <div class="form-section">
+            <h2>Datos Académicos</h2>
+            {{ academic_form.as_p }}
+        </div>
+
+        <button type="submit">Guardar Registro</button>
+    </form>
+</body>
+</html>
