@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 from django.views.static import serve
 
 from aplicaciones.formulario_egresados import views
+from . import views
 
 app_name ="formulario_egresados"
 
@@ -17,6 +18,7 @@ urlpatterns = [
 
    path('form-becarios', views.datos_personales_egresado, name='registro'),
    path('listado', views.mi_vista, name='listado'),
+   path('datos/', views.consultar_cedula, name='datos'),
 
  #   path('', views.home, name='inicio'),
  #  path('listado', views.listado, name='listado'),

@@ -1,10 +1,10 @@
 
-const getMunicipios = async (idEstado) => {
-    let url = "/api/get_municipios/"; // URL ajustada
+const getMunicipios = async (idestado) => {
+    let url = "api/views/get_municipios/"; // URL ajustada
     // ... el resto de la función
 };
 
-const getParroquias = async (idMunicipio) => {
-    let url = "/api/get_parroquias/"; // URL ajustada
+const getParroquias = async (idmunicipio) => {
+    let url = "api/views/get_parroquias/"; // URL ajustada
     // ... el resto de la función
 };

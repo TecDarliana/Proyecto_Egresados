@@ -1,5 +1,6 @@
 from django import forms
 from aplicaciones.formulario_egresados.models import *
+from .models import Estado, Municipio
 
 
 
@@ -12,9 +13,9 @@ class datos_pesonales_formModel(forms.ModelForm):
         fields= "__all__"
         widgets = {
                # Los widgets se usarán en el template, pero la lógica de filtrado va en JS
-            'estado': forms.Select(),
-            'municipio': forms.Select(),
-            'parroquia': forms.Select(),
+            'estado':  forms.Select(attrs={'onchange':"filtrarMunicipio(this.value)"}),
+          #  'municipio':  forms.Select(attrs={'onchange':"filtrarParroquia(this.value)"}),
+          #  'parroquia': forms.Select(),
 
         }
 

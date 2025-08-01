@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render #, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import models
@@ -8,7 +8,10 @@ from uuid import uuid4
 from .models import *
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse
 # from post.api.serializers import PostSerilizer
+import requests
+import json
 
 from aplicaciones.formulario_egresados.forms import *
 from aplicaciones.formulario_egresados.models import *
@@ -51,3 +54,42 @@ def mi_vista(request):
 
     # Renderiza la plantilla 'mi_plantilla.html' con el contexto
   return render(request, 'form-listado.html')
+
+
+def obtener_municipios(request, estado_id):
+    municipios = Municipio.objects.filter(estado_id=estado_id).values('id', 'nombre').order_by('nombre')
+    return JsonResponse(list(municipios), safe=False)
+
+
+def consultar_cedula(request):
+    nacionalidad = request.GET.get('nacionalidad')
+    cedula = request.GET.get('cedula')
+
+    if not nacionalidad or not cedula:
+        # Devuelve JSON con un error si faltan los parámetros
+        return JsonResponse({'error': "Se requieren los parámetros 'nacionalidad' y 'cedula'."}, status=400)
+
+    url = "https://comunajoven.com.ve/api/cedula"
+    params = {'nacionalidad': nacionalidad, 'cedula': cedula}
+    headers = {
+        'Authorization': 'Bearer faa3dc480981bbfb734839367d2c9367',
+        'Accept': 'application/json'
+    }
+
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        data = json.loads(response.content.decode('utf-8-sig'))
+        
+        # Devuelve JSON si la petición es exitosa
+        print(data)
+        return JsonResponse(data, status=200, safe=True) 
+        
+    except requests.exceptions.HTTPError as e:
+        # Devuelve JSON con un error si la API responde con un error HTTP
+        return JsonResponse({'error': f"Error HTTP al consultar la API: {e}"}, status=response.status_code)
+    except Exception as e:
+        print(f"Error al consultar API: {e}")
+        # Devuelve JSON con un error para cualquier otra excepción
+        return JsonResponse({'error': str(e)}, status=500)

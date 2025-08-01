@@ -3,68 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Datos</title>
+    <title>Consulta de Datos por Cédula</title>
     <style>
-        /* Estilos básicos para que se vea un poco mejor */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        form { background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .form-section { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="email"], select, textarea {
-            width: calc(100% - 22px); /* Ajusta para padding y borde */
-            padding: 10px;
-            margin-bottom: 10px;
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5em;
+            color: #555;
+            text-align: left;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 0.75em;
+            margin-bottom: 1em;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
         }
         button {
+            width: 100%;
+            padding: 0.75em;
             background-color: #007bff;
             color: white;
-            padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
+            font-size: 1em;
             cursor: pointer;
-            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
         button:hover {
             background-color: #0056b3;
         }
-        .errorlist {
+        #datos-container {
+            margin-top: 1.5em;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding-top: 1.5em;
+        }
+        #datos-container p {
+            margin: 0.5em 0;
+            color: #444;
+        }
+        .error {
             color: red;
-            list-style-type: none;
-            padding: 0;
-            margin-top: -8px;
-            margin-bottom: 10px;
+            margin-top: 1em;
         }
     </style>
 </head>
 <body>
-    <h1>Registro de Usuario</h1>
 
-    <form method="post">
-        {% csrf_token %}
+    <div class="container">
+        <h1>Consultar Datos</h1>
+        <form id="formulario-cedula">
+            <label for="nacionalidad">Nacionalidad:</label>
+            <select id="nacionalidad" name="nacionalidad" required>
+                <option value="V">Venezolano</option>
+                <option value="E">Extranjero</option>
+            </select>
 
-        <div class="form-section">
-            <h2>Datos Personales</h2>
-            {{ personal_form.as_p }}
-            <p>
-                <script>
-                    function filtrarDireccion(value) {
-                        console.log("Filtrando por: " + value);
-                        // Implementa tu lógica AJAX aquí para actualizar los select de municipio y parroquia
-                        // con base en el 'estado' o 'municipio' seleccionado.
-                        // Esto probablemente requerirá una nueva llamada a la API o a otra vista de Django.
+            <label for="cedula">Ingresa el número de cédula:</label>
+            <input type="text" id="cedula" name="cedula" required>
+            
+            <button type="submit">Consultar</button>
+        </form>
+        
+        <div id="datos-container">
+            <p>Ingresa una cédula y presiona "Consultar" para ver la información.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('formulario-cedula').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const nacionalidad = document.getElementById('nacionalidad').value;
+            const cedula = document.getElementById('cedula').value;
+            const datosContainer = document.getElementById('datos-container');
+            
+            const urlApi = `http://127.0.0.1:8000/datos/?nacionalidad=${nacionalidad}&cedula=${cedula}`;
+
+            datosContainer.innerHTML = '<p>Cargando datos...</p>';
+
+            fetch(urlApi)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: No se pudo obtener la información.`);
                     }
-                </script>
-            </p>
-        </div>
+                    return response.json();
+                })
+                .then(data => {
+                    // El objeto data contiene 'success', 'data', y 'message'
+                    if (data.success && data.data) {
+                        const persona = data.data;
 
-        <div class="form-section">
-            <h2>Datos Académicos</h2>
-            {{ academic_form.as_p }}
-        </div>
+                        datosContainer.innerHTML = `
+                            <p><strong>Cédula:</strong> ${persona.cedula}</p>
+                            <p><strong>Nombre:</strong> ${persona.name}</p>
+                            <p><strong>Apellido:</strong> ${persona.lastname}</p>
+                            <p><strong>Fecha de Nacimiento:</strong> ${persona.birthDate}</p>
+                            <p><strong>Estado:</strong> ${persona.name_estado}</p>
+                            <p><strong>Municipio:</strong> ${persona.name_municipio}</p>
+                            <p><strong>Parroquia:</strong> ${persona.name_parroquia}</p>
+                        `;
+                    } else {
+                        datosContainer.innerHTML = `<p>${data.message || 'No se encontraron datos para la cédula ingresada.'}</p>`;
+                    }
+                })
+                .catch(error => {
+                    datosContainer.innerHTML = `<p class="error">Ocurrió un error: ${error.message}</p>`;
+                    console.error('Error al obtener los datos:', error);
+                });
+        });
+    </script>
 
-        <button type="submit">Guardar Registro</button>
-    </form>
 </body>
 </html>

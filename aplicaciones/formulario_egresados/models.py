@@ -11,14 +11,14 @@ class Estado(models.Model):
 
 class Municipio(models.Model):
      nombre = models.CharField('Municipio: ', max_length=100, blank = True, null = True)
-     estado = models.ForeignKey(Estado, on_delete=models.CASCADE, blank = True, null = True)
+     estado = models.ForeignKey(Estado, on_delete=models.CASCADE, blank = True, null = True, related_name='municipios')
      def __str__(self):
         # Es útil incluir el estado para mayor claridad si el nombre del municipio no es único globalmente
         return f"{self.nombre} ({self.estado.nombre})" if self.estado else self.nombre
 
 class Parroquia(models.Model):
       nombre = models.CharField('Parroquia: ', max_length=100, blank = True, null = True)
-      municipio = models.ForeignKey(Municipio, on_delete=models.CASCADE, blank = True, null = True)
+      municipio = models.ForeignKey(Municipio, on_delete=models.CASCADE,related_name='parroquias', blank = True, null = True)
       def __str__(self):
         # Incluye el municipio para mayor claridad
         return f"{self.nombre} ({self.municipio.nombre})" if self.municipio else self.nombre
@@ -34,17 +34,23 @@ class DatosPersonales(models.Model):
         ('doctorado','Doctorado'),
     ]
     
+    nacionalidad = [
+        
+        ('v','V'),
+        ('e','E'),
+    ]
+
     id = models.AutoField(primary_key=True)
 
-    cedula = models.CharField('Cédula:', unique=True, blank = False, null = False)
+    cedula = models.IntegerField('Cédula:', unique=True, blank = False, null = False)
     nombres = models.CharField('Nombres:', max_length=200,blank = False, null = False)
     apellidos = models.CharField('Apellidos:', max_length=200, blank = False, null = False)
     email = models.EmailField("Correo Electrónico: ", max_length=200, unique=True, blank = False, null = False)
-    telefono = models.CharField("Teléfono Celular", max_length=15, blank=False,null=False)
-    telefono2 = models.CharField("Teléfono Local o Alternativo", max_length=20, blank=False,null=False)
+    telefono = models.IntegerField("Teléfono Celular", blank=False,null=False)
+    telefono2 = models.IntegerField("Teléfono Local o Alternativo", blank=False,null=False)
     fecha_naci = models.DateField ('Fecha de Nacimiento', blank = False, null = False)
     lugar_naci = models.CharField('Lugar de Nacimiento:', max_length=200,blank = False, null = False)
-    nacionalidad = models.CharField('Nacionalidad:', max_length=200, blank = False, null = False)
+    nacionalidad = models.CharField('Nacionalidad:', choices=nacionalidad, max_length=200, blank = False, null = False)
     titularidad = models.CharField('Titularidad:', choices=titularidad, max_length=200, blank = False, null = False)
     idiomas = models.CharField('Idiomas qué Domina:', max_length=200, blank = False, null = False)
     ocupacion = models.CharField('Ocupación Actual:', max_length=200, blank = False, null = False)

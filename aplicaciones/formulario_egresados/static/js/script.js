@@ -2,7 +2,7 @@
  * Función que recibe el id del Piso seleccionado y filtra las direcciones de acuerdo a ese id (piso),
  * ademas retorna la lista de direccion para dicho piso.
  */
-const filtrarDireccion = async (idpiso) => {
+const filtrarDireccion = async (idestado) => {
     const csrfTokenValue = document.querySelector(
       "[name=csrfmiddlewaretoken]"
     ).value;
@@ -12,13 +12,13 @@ const filtrarDireccion = async (idpiso) => {
   
     let url = "/api/buscadordireccion";
     try {
-      const response = await axios.post(url, { idpiso }, { headers });
+      const response = await axios.post(url, { idestado }, { headers });
   
       const { data, status } = response;
       console.log(data.data);
   
       if (status == 200) {
-        let selectDireccion = document.querySelector("#id_direccion");
+        let selectMunicipio = document.querySelector("#id_municipio");
         selectDireccion.innerHTML = "";
   
       /**   let zonas = document.querySelector("#zonas");
@@ -28,14 +28,14 @@ const filtrarDireccion = async (idpiso) => {
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
         defaultOption.text = "Seleccione";
-        selectDireccion.appendChild(defaultOption);
+        selectMunicipio.appendChild(defaultOption);
   
         // Itera sobre la data para agregar las direcciones al select
         data.data.forEach((item) => {
           const option = document.createElement("option");
           option.value = item.id;
           option.text = item.nombre;
-          selectDireccion.appendChild(option);
+          selectMunicipio.appendChild(option);
         });
       } else {
         console.log("No hay Departamentos para la selección");
